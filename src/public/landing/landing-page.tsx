@@ -1,11 +1,12 @@
 import "./landing-page.scss";
 import React, { useEffect, useState } from "react";
 import { mainModule } from "john-c-new-package";
-import { TableView, DateField, DropdownField, Loader } from "react-simple-widgets";
+import { TableView, DateField, DropdownField, Loader, BusyButton } from "react-simple-widgets";
 import moment from "moment";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import { countries } from "../../common/countries";
+import {createStatusSpan} from "../../common"
 
 interface IValues {
     country: string;
@@ -16,6 +17,14 @@ interface IValues {
 export const LandingPage = (): any => {
     document.title = "testing_npm_package";
 
+    const sorterd_countries = countries.sort((a:any, b:any) => {
+        if(a.Country < b.Country) return -1
+        if(a.Country > b.Country) return 1
+        return 0
+    }) 
+
+    console.log(sorterd_countries)
+
     useEffect(() => {
     }, [])
 
@@ -23,11 +32,13 @@ export const LandingPage = (): any => {
     const [loading, setLoading] = useState(false)
 
     const initialValues = {
+        country: "",
         from: "",
         to: ""
     };
 
     const validationSchema = Yup.object({
+        country: Yup.string().required("Required"), 
         from: Yup.date().required("Required"),
         to: Yup.date().required("Required")
     });
@@ -52,14 +63,16 @@ export const LandingPage = (): any => {
     return (
         <div id="landing-page" className="grid-center h-100">
             <div className="container d-flex flex-column justify-content-start align-items-center w-640">
+                <h2 className="fw-300 mb-5">World Covid Data</h2>
+
                 <div style={{ width: "100%" }}>
                     <Formik onSubmit={testPackage} initialValues={initialValues} validationSchema={validationSchema}>
                         {formik => (
                             <form onSubmit={formik.handleSubmit}>
                                 <div className="mb-3">
-                                    <DropdownField name="country" label="Country">
+                                    <DropdownField name="country" label="Country Name">
                                         <option value={null}></option>
-                                        {countries.map((country: any) => {
+                                        {sorterd_countries.map((country: any) => {
                                             return <option key={country.ISO2} value={country.Slug} >
                                                 {country.Country}
                                             </option>
@@ -96,9 +109,12 @@ export const LandingPage = (): any => {
                                         />
                                     </span>
                                 </div>
-                                <button type="submit" className="btn btn-primary">
+                                {/* <button type="submit" className="btn btn-primary">
                                     Get Covid Data
-                                </button>
+                                </button> */}
+                                <BusyButton type="submit" className="btn btn-primary" busy={loading}>
+                                    Get Covid Data 
+                                </BusyButton>
                             </form>
                         )}
                     </Formik>
@@ -113,7 +129,7 @@ export const LandingPage = (): any => {
                         ["Country Code", "CountryCode"],
                         ["Cases", "Cases"],
                         ["Date", req => moment(req.Date).format("dddd, Do MMMM YYYY")],
-                        ["Status", "Status"]
+                        ["Status", req => createStatusSpan(req.Status)]
                     ]}
                 />
             </div>
