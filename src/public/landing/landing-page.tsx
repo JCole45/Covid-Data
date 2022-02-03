@@ -3,10 +3,10 @@ import React, { useEffect, useState } from "react";
 import { mainModule } from "john-c-new-package";
 import { TableView, DateField, DropdownField, Loader, BusyButton } from "react-simple-widgets";
 import moment from "moment";
-import { Formik, Form } from "formik";
+import { Formik } from "formik";
 import * as Yup from "yup";
 import { countries } from "../../common/countries";
-import {createStatusSpan} from "../../common"
+import { createStatusSpan } from "../../common";
 
 interface IValues {
     country: string;
@@ -17,19 +17,16 @@ interface IValues {
 export const LandingPage = (): any => {
     document.title = "testing_npm_package";
 
-    const sorterd_countries = countries.sort((a:any, b:any) => {
-        if(a.Country < b.Country) return -1
-        if(a.Country > b.Country) return 1
-        return 0
-    }) 
+    const sorterd_countries = countries.sort((a: any, b: any) => {
+        if (a.Country < b.Country) return -1;
+        if (a.Country > b.Country) return 1;
+        return 0;
+    });
 
-    console.log(sorterd_countries)
-
-    useEffect(() => {
-    }, [])
+    useEffect(() => {}, []);
 
     const [cases, setCases] = useState([]);
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
 
     const initialValues = {
         country: "",
@@ -38,24 +35,25 @@ export const LandingPage = (): any => {
     };
 
     const validationSchema = Yup.object({
-        country: Yup.string().required("Required"), 
+        country: Yup.string().required("Required"),
         from: Yup.date().required("Required"),
         to: Yup.date().required("Required")
     });
 
     const testPackage = async (values: IValues) => {
-        console.log(values)
-        setLoading(true)
-        mainModule.getCovidData(new Date(values.from).toISOString(), new Date(values.to).toISOString(), values.country )
-        .then((data:any) => {
-            setCases(data);
-        })
-        .catch((err:any) => {
-            console.log(err)
-        })
-        .then(() => {
-            setLoading(false)
-        })
+        console.log(values);
+        setLoading(true);
+        mainModule
+            .getCovidData(new Date(values.from).toISOString(), new Date(values.to).toISOString(), values.country)
+            .then((data: any) => {
+                setCases(data);
+            })
+            .catch((err: any) => {
+                console.log(err);
+            })
+            .then(() => {
+                setLoading(false);
+            });
 
         console.log(mainModule.message());
     };
@@ -73,15 +71,17 @@ export const LandingPage = (): any => {
                                     <DropdownField name="country" label="Country Name">
                                         <option value={null}></option>
                                         {sorterd_countries.map((country: any) => {
-                                            return <option key={country.ISO2} value={country.Slug} >
-                                                {country.Country}
-                                            </option>
+                                            return (
+                                                <option key={country.ISO2} value={country.Slug}>
+                                                    {country.Country}
+                                                </option>
+                                            );
                                         })}
                                     </DropdownField>
                                 </div>
 
                                 <div className="mb-3 d-flex justify-content-between">
-                                    <span style={{width:"46%"}}>
+                                    <span style={{ width: "46%" }}>
                                         <DateField
                                             name="from"
                                             label="From"
@@ -95,7 +95,7 @@ export const LandingPage = (): any => {
                                         />
                                     </span>
 
-                                    <span style={{width:"46%"}}>
+                                    <span style={{ width: "46%" }}>
                                         <DateField
                                             name="to"
                                             label="To"
@@ -113,14 +113,18 @@ export const LandingPage = (): any => {
                                     Get Covid Data
                                 </button> */}
                                 <BusyButton type="submit" className="btn btn-primary" busy={loading}>
-                                    Get Covid Data 
+                                    Get Covid Data
                                 </BusyButton>
                             </form>
                         )}
                     </Formik>
                 </div>
 
-                {loading && <div className="d-flex">Please wait <Loader/></div>}
+                {loading && (
+                    <div className="d-flex">
+                        Please wait <Loader />
+                    </div>
+                )}
                 <TableView
                     items={cases}
                     props={[
